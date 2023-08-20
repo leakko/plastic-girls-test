@@ -5,7 +5,7 @@ interface IUserModel {
 	password: string;
 }
 
-const UserSchema = new Schema<IUser>({
+const UserSchema = new Schema<IUserModel>({
 	email: {
 		type: String,
 		required: [true, 'Please provide an email address'],
