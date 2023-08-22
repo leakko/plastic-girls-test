@@ -17,7 +17,6 @@ const handler = async (req: Request) => {
 
 	let body: IUser;
 	try {
-		console.log("REQUEST", req);
 		body = await req.json();
 	} catch(e) {
 		return new NextResponse('No body provided', { status: 400 });
