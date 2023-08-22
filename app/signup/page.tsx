@@ -11,6 +11,7 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import Alert from '@mui/material/Alert';
 
 export default function SignUp() {
 	const [ submitError, setSubmitError ] = React.useState<string | null>(null);
@@ -35,11 +36,16 @@ export default function SignUp() {
 			});
 
 			if(apiResponse.ok) {
+				setSubmitError(null);
 				router.push('/');
-			} 
+			} else {
+				const responseText = await apiResponse.text()
+				setSubmitError(responseText);
+			}
 		} catch(error) {
-			console.log("ERROR: ", error);
+			setSubmitError((error as Error).message);
 		}
+		setLoading(false);
 	};
 
 	return (
@@ -68,6 +74,7 @@ export default function SignUp() {
 			name="email"
 			autoComplete="email"
 			InputLabelProps={{ shrink: true }}
+			disabled={loading}
 		/>
 		<TextField
 			margin="normal"
@@ -79,7 +86,9 @@ export default function SignUp() {
 			id="password"
 			autoComplete="current-password"
 			InputLabelProps={{ shrink: true }}
+			disabled={loading}
 		/>
+		{ submitError && <Alert severity="error">{ submitError }</Alert> }
 		<Button
 			type="submit"
 			fullWidth
