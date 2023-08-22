@@ -29,7 +29,7 @@ const handler = async (req: Request) => {
 	const user = await User.findOne({ email });
 
 	if (user) {
-		return new NextResponse('Email already exists', { status: 409 });
+		return new NextResponse('Email already in use', { status: 409 });
 	} else {
 		if (!password) {
 			return new NextResponse('No password provided', { status: 400 });
