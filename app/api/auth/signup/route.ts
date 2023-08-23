@@ -86,7 +86,7 @@ const handler = async (req: Request) => {
 				email: data.email,
 				_id: data._id
 			}
-			await sendMail('plasticgirls69@gmail.com');
+			await sendMail(email);
 			return NextResponse.json(user, { status: 201 });
 		} catch (error) {
 			if(error instanceof mongoose.Error.ValidationError) {
