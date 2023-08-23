@@ -3,6 +3,7 @@ import { Schema, model, models } from 'mongoose';
 interface IUserModel {
 	email: string;
 	password: string;
+	active: boolean;
 }
 
 const UserSchema = new Schema<IUserModel>({
@@ -17,6 +18,11 @@ const UserSchema = new Schema<IUserModel>({
 		required: [true, 'Please provide a password'],
 		select: false,
 	},
+	active: {
+		type: Boolean,
+		required: [true, 'Please provide if the user is active'],
+		default: false
+	}
 });
 
 const User = models.User || model('User', UserSchema);

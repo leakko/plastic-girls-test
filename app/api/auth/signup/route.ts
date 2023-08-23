@@ -1,12 +1,50 @@
 import { NextResponse } from 'next/server';
 import { connectToMongoDB } from '@/lib/mongodb';
+import nodemailer, { TransportOptions } from 'nodemailer';
+import { google } from 'googleapis';
 import mongoose, { Connection } from 'mongoose';
 import { hash } from 'bcryptjs';
 import User from '@/models/user';
 import { IUser } from '@/types/index';
 
+const oAuth2Client = new google.auth.OAuth2(
+	process.env.GOOGLE_MAIL_CLIENT_ID, 
+	process.env.GOOGLE_MAIL_SECRET, 
+	process.env.GMAIL_REDIRECT_URI
+)
+oAuth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN })
+
+const sendMail = async (to: string) => {
+	try {
+		const accessToken = await oAuth2Client.getAccessToken();
+		const transport = nodemailer.createTransport({
+			service: 'gmail',
+			auth: {
+				type: 'OAuth2',
+				user: 'plasticgirls69@gmail.com',
+				clientId: process.env.GOOGLE_MAIL_CLIENT_ID,
+				clientSecret: process.env.GOOGLE_MAIL_SECRET, 
+				refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+				accessToken
+			}
+		} as TransportOptions)
+
+		const mailOptions = {
+			from: 'Plastic Girls',
+			to,
+			subject: 'Activate your plastic girls account',
+			text: 'Test',
+			html: 'Test'
+		}
+
+		return await transport.sendMail(mailOptions);
+
+	} catch (error) {
+		return error;
+	}
+}
+
 const handler = async (req: Request) => {
-	let connection: Connection | null;
 	try {
 		await connectToMongoDB()
 	} catch (error) {
@@ -48,7 +86,7 @@ const handler = async (req: Request) => {
 				email: data.email,
 				_id: data._id
 			}
-	
+			await sendMail('plasticgirls69@gmail.com');
 			return NextResponse.json(user, { status: 201 });
 		} catch (error) {
 			if(error instanceof mongoose.Error.ValidationError) {

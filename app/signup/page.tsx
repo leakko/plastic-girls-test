@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import { CircularProgress } from '@mui/material';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -14,8 +15,9 @@ import Container from '@mui/material/Container';
 import Alert from '@mui/material/Alert';
 
 export default function SignUp() {
-	const [ submitError, setSubmitError ] = React.useState<string | null>(null);
+	const [ alertMessage, setAlertMessage ] = React.useState<string | null>(null);
 	const [ loading, setLoading ] = React.useState<boolean>(false);
+	const [ alertModality, setAlertModality ] = React.useState< 'error' | 'success' >('error');
 	const router = useRouter();
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -36,14 +38,17 @@ export default function SignUp() {
 			});
 
 			if(apiResponse.ok) {
-				setSubmitError(null);
-				router.push('/');
+				setAlertMessage('Success! Now check your email to activate your account 📧');
+				setAlertModality('success');
+				
 			} else {
 				const responseText = await apiResponse.text()
-				setSubmitError(responseText);
+				setAlertMessage(responseText);
+				setAlertModality('error');
 			}
 		} catch(error) {
-			setSubmitError((error as Error).message);
+			setAlertMessage((error as Error).message);
+			setAlertModality('error');
 		}
 		setLoading(false);
 	};
@@ -88,22 +93,32 @@ export default function SignUp() {
 			InputLabelProps={{ shrink: true }}
 			disabled={loading}
 		/>
-		{ submitError && <Alert severity="error">{ submitError }</Alert> }
-		<Button
-			type="submit"
-			fullWidth
-			variant="contained"
-			sx={{ mt: 3, mb: 2 }}
-		>
-			Sign Up
-		</Button>
-		<Grid container>
-			<Grid item>
-			<Link href="#" variant="body2">
-				{"Already have an account? Sign In"}
-			</Link>
+		{ alertMessage && <Alert sx={{ mt: 2 }} severity={alertModality}>{ alertMessage }</Alert> }
+		{ loading 
+		? <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+				<CircularProgress />
+			</Box>
+		: 
+		alertModality !== 'success'
+		? <Box>
+				<Button
+					type="submit"
+					fullWidth
+					variant="contained"
+					sx={{ mt: 3, mb: 2 }}
+				>
+					Sign Up
+				</Button>
+				<Grid container>
+				<Grid item>
+				<Link href="#" variant="body2">
+					{"Already have an account? Sign In"}
+				</Link>
+				</Grid>
 			</Grid>
-		</Grid>
+			</Box>
+		: null
+		}
 		</Box>
 	</Box>
 	</Container>
