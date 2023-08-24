@@ -9,7 +9,7 @@ import { CircularProgress } from '@mui/material';
 import Link from 'next/link'
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import LoginOutlined from '@mui/icons-material/LoginOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Alert from '@mui/material/Alert';
@@ -26,7 +26,7 @@ export default function SignUp() {
 
 		try {
 			setLoading(true);
-			const apiResponse = await fetch('/api/signup', { 
+			const apiResponse = await fetch('/api/signin', { 
 				method: 'POST', 
 				headers: {
 					'Content-Type': 'application/json'
@@ -38,11 +38,8 @@ export default function SignUp() {
 			});
 
 			if(apiResponse.ok) {
-				setAlertMessage('Success! Now check your email to activate your account 📧');
-				setAlertModality('success');
-				setTimeout(() => {
-					router.push('/signin');
-				}, 5000)
+				setAlertMessage(null);
+				router.push('/');
 				
 			} else {
 				const responseText = await apiResponse.text()
@@ -67,10 +64,10 @@ export default function SignUp() {
 		}}
 	>
 		<Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-		<LockOutlinedIcon />
+		<LoginOutlined />
 		</Avatar>
 		<Typography component="h1" variant="h5">
-		Register
+		Login
 		</Typography>
 		<Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
 		<TextField
@@ -110,12 +107,12 @@ export default function SignUp() {
 					variant="contained"
 					sx={{ mt: 3, mb: 2 }}
 				>
-					Sign Up
+					LOGIN
 				</Button>
 				<Grid container>
 				<Grid item>
-				<Link href="/signin">
-					{"Already have an account? Sign In"}
+				<Link href="/signup">
+					{"Don't you have an account? Register"}
 				</Link>
 				</Grid>
 			</Grid>

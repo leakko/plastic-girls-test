@@ -4,7 +4,7 @@ import nodemailer, { TransportOptions } from 'nodemailer';
 import { google } from 'googleapis';
 import mongoose, { Connection } from 'mongoose';
 import { hash } from 'bcryptjs';
-import User from '@/models/user';
+import User from '@/models/db/user';
 import { IUser } from '@/types/index';
 
 const oAuth2Client = new google.auth.OAuth2(
@@ -14,7 +14,7 @@ const oAuth2Client = new google.auth.OAuth2(
 )
 oAuth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN })
 
-const sendMail = async (to: string) => {
+const sendMail = async (to: string, userId: string) => {
 	try {
 		const accessToken = await oAuth2Client.getAccessToken();
 		const transport = nodemailer.createTransport({
@@ -33,8 +33,17 @@ const sendMail = async (to: string) => {
 			from: 'Plastic Girls',
 			to,
 			subject: 'Activate your plastic girls account',
-			text: 'Test',
-			html: 'Test'
+			text: `
+				Hello Plastic Girls' lover!
+				To start exploring the most plastic models of the world
+				Navigate to this URL ${process.env.DOMAIN}/activate/${userId} to confirm your email
+			`,
+			html: `
+				<img style="width: 250px; height: auto;" src="https://drive.google.com/uc?export=view&id=1vOJxjvhKtiEkSDn1JIhRRZyiaMrJwk20">
+				<h3>Hello Plastic Girls' lover!</h3> <br>
+				To start exploring the most plastic models of the world 🔥<br>
+				Click <a href="${process.env.DOMAIN}/activate/${userId}">here</a> to confirm your email ✅
+			`
 		}
 
 		return await transport.sendMail(mailOptions);
@@ -64,17 +73,18 @@ const handler = async (req: Request) => {
 
 	if(!email) return new NextResponse('No email provided', { status: 400 });
 
-	const user = await User.findOne({ email });
+	if (!password) {
+		return new NextResponse('No password provided', { status: 400 });
+	}
+	if (password.length < 8) {
+		return new NextResponse('Password must be at least 8 characters long', { status: 400 });
+	}
+
+	const user = await User.findOne({ email }).exec();
 
 	if (user) {
 		return new NextResponse('Email already in use', { status: 409 });
 	} else {
-		if (!password) {
-			return new NextResponse('No password provided', { status: 400 });
-		}
-		if (password.length < 8) {
-			return new NextResponse('Password must be at least 8 characters long', { status: 400 });
-		}
 		const hashedPassword = await hash(password, 10);
 
 		try {
@@ -86,7 +96,7 @@ const handler = async (req: Request) => {
 				email: data.email,
 				_id: data._id
 			}
-			await sendMail(email);
+			await sendMail(email, data._id);
 			return NextResponse.json(user, { status: 201 });
 		} catch (error) {
 			if(error instanceof mongoose.Error.ValidationError) {
