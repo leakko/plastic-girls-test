@@ -16,7 +16,7 @@ const handler = NextAuth({
 			},
 			async authorize(credentials, req) {
 			  // Add logic here to look up the user from the credentials supplied
-			  const resp = await fetch('api/login', {
+			  const resp = await fetch('api/signin', {
 				method: 'POST',
 				headers: {
 					"Content-Type": "application/json"
@@ -26,13 +26,17 @@ const handler = NextAuth({
 					password: credentials?.password
 				})
 			  })
+
+			  console.log("RESP 1", resp)
 		
 			  if (!resp.ok) {
 				// If you return null then an error will be displayed advising the user to check their details.
 				return null
 			  } else {
+				console.log("RESP 2", resp)
 				// Any object returned will be saved in `user` property of the JWT
 				const user = await resp.json();
+				console.log("RETURNED USER", user)
 				return user;
 				// You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
 			  }
