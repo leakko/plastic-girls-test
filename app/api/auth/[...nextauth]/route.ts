@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth/next';
+import NextAuth from 'next-auth';
 import CredentialsProvider from "next-auth/providers/credentials";
 
 const handler = NextAuth({
@@ -11,35 +11,34 @@ const handler = NextAuth({
 			// e.g. domain, username, password, 2FA token, etc.
 			// You can pass any HTML attribute to the <input> tag through the object.
 			credentials: {
-			  username: { label: "Username", type: "text", placeholder: "jsmith" },
+			  email: { label: "Email", type: "email", placeholder: "john@gmail.com" },
 			  password: { label: "Password", type: "password" }
 			},
 			async authorize(credentials, req) {
 			  // Add logic here to look up the user from the credentials supplied
-			  const resp = await fetch('api/signin', {
-				method: 'POST',
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify({
-					username: credentials?.username,
-					password: credentials?.password
-				})
-			  })
 
-			  console.log("RESP 1", resp)
+				const resp = await fetch(`${process.env.DOMAIN}/api/login`, {
+					method: 'POST',
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify({
+						email: credentials?.email,
+						password: credentials?.password
+					})
+				})
 		
-			  if (!resp.ok) {
+				if (!resp?.ok) {
 				// If you return null then an error will be displayed advising the user to check their details.
+				console.log("RETURN NULL");
 				return null
-			  } else {
-				console.log("RESP 2", resp)
+				} else {
 				// Any object returned will be saved in `user` property of the JWT
 				const user = await resp.json();
-				console.log("RETURNED USER", user)
+				console.log("RETURNED USER", user);
 				return user;
 				// You can also Reject this callback with an Error thus the user will be sent to the error page with the error message as a query parameter
-			  }
+				}
 			}
 		})
 	]

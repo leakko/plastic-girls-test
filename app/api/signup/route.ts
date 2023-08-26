@@ -36,13 +36,13 @@ const sendMail = async (to: string, userId: string) => {
 			text: `
 				Hello Plastic Girls' lover!
 				To start exploring the most plastic models of the world
-				Navigate to this URL ${process.env.DOMAIN}/activate/${userId} to confirm your email
+				Navigate to this URL ${process.env.DOMAIN}activate/${userId} to confirm your email
 			`,
 			html: `
 				<img style="width: 250px; height: auto;" src="https://drive.google.com/uc?export=view&id=1vOJxjvhKtiEkSDn1JIhRRZyiaMrJwk20">
 				<h3>Hello Plastic Girls' lover!</h3> <br>
 				To start exploring the most plastic models of the world 🔥<br>
-				Click <a href="${process.env.DOMAIN}/activate/${userId}">here</a> to confirm your email ✅
+				Click <a href="${process.env.DOMAIN}activate/${userId}">here</a> to confirm your email ✅
 			`
 		}
 
