@@ -1,10 +1,5 @@
 import { Schema, model, models } from 'mongoose';
-
-export interface IUserModel {
-	email: string;
-	password: string;
-	active: boolean;
-}
+import { IUserModel } from '@/models/interfaces/user-model';
 
 const UserSchema = new Schema<IUserModel>({
 	email: {
